@@ -51,7 +51,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc rdoc/*
 %{ruby_rubylibdir}/tmail
 %{ruby_rubylibdir}/tmail.rb
-%{ruby_archdir}/tmail/*.so
+%attr(755,root,root) %{ruby_archdir}/tmail/*.so
 %{ruby_ridir}/TMail
 %{ruby_ridir}/StringInput
 %{ruby_ridir}/StringOutput
