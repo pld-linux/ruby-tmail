@@ -1,5 +1,6 @@
 %define	ruby_archdir	%(ruby -r rbconfig -e 'print Config::CONFIG["archdir"]')
 %define ruby_rubylibdir %(ruby -r rbconfig -e 'print Config::CONFIG["rubylibdir"]')
+%define	ruby_ridir	%(ruby -r rbconfig -e 'include Config; print File.join(CONFIG["datadir"], "ri", CONFIG["ruby_version"], "system")')
 Summary:	TMail mail library
 Summary(pl):	TMail - biblioteka do obs³ugi poczty
 Name:		ruby-TMail
@@ -32,12 +33,15 @@ ruby setup.rb config \
 ruby setup.rb setup
 
 rdoc -o rdoc/ --main README.en README.en README.ja NEWS BUGS TODO lib/* doc/* doc.en/* doc.ja/* --title "%{name} %{version}" --inline-source
+rdoc --ri -o ri lib/*
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT%{ruby_rubylibdir}
+install -d $RPM_BUILD_ROOT{%{ruby_rubylibdir},%{ruby_ridir}}
 
 ruby setup.rb install --prefix=$RPM_BUILD_ROOT
+
+cp -a ri/ri/* $RPM_BUILD_ROOT%{ruby_ridir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -48,3 +52,6 @@ rm -rf $RPM_BUILD_ROOT
 %{ruby_rubylibdir}/tmail
 %{ruby_rubylibdir}/tmail.rb
 %{ruby_archdir}/tmail/*.so
+%{ruby_ridir}/TMail
+%{ruby_ridir}/StringInput
+%{ruby_ridir}/StringOutput
