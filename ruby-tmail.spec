@@ -1,6 +1,3 @@
-%define	ruby_archdir	%(ruby -r rbconfig -e 'print Config::CONFIG["archdir"]')
-%define ruby_rubylibdir %(ruby -r rbconfig -e 'print Config::CONFIG["rubylibdir"]')
-%define	ruby_ridir	%(ruby -r rbconfig -e 'include Config; print File.join(CONFIG["datadir"], "ri", CONFIG["ruby_version"], "system")')
 Summary:	TMail mail library
 Summary(pl):	TMail - biblioteka do obs³ugi poczty
 Name:		ruby-TMail
@@ -11,6 +8,7 @@ Group:		Development/Languages
 Source0:	http://i.loveruby.net/archive/tmail/tmail-%{version}.tar.gz
 # Source0-md5:	abd5916459691aec669f1bbf78e201d3
 URL:		http://i.loveruby.net/en/prog/tmail.html
+BuildRequires:	rpmbuild(macros) >= 1.263
 BuildRequires:	ruby
 BuildRequires:	ruby-devel
 Requires:	ruby
