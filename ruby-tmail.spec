@@ -2,16 +2,16 @@ Summary:	TMail mail library
 Summary(pl):	TMail - biblioteka do obs³ugi poczty
 Name:		ruby-TMail
 Version:	0.10.8
-Release:	3
+Release:	4
 License:	GPL
 Group:		Development/Languages
 Source0:	http://i.loveruby.net/archive/tmail/tmail-%{version}.tar.gz
 # Source0-md5:	abd5916459691aec669f1bbf78e201d3
 URL:		http://i.loveruby.net/en/prog/tmail.html
 BuildRequires:	rpmbuild(macros) >= 1.263
-BuildRequires:	ruby
+BuildRequires:	ruby-modules
 BuildRequires:	ruby-devel
-Requires:	ruby
+Requires:	ruby-modules
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
