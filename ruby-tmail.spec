@@ -8,9 +8,9 @@ Group:		Development/Languages
 Source0:	http://i.loveruby.net/archive/tmail/tmail-%{version}.tar.gz
 # Source0-md5:	abd5916459691aec669f1bbf78e201d3
 URL:		http://i.loveruby.net/en/prog/tmail.html
-BuildRequires:	rpmbuild(macros) >= 1.263
+BuildRequires:	rpmbuild(macros) >= 1.277
 BuildRequires:	ruby-devel
-Requires:	ruby-modules
+%ruby_mod_ver_requires_eq
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
