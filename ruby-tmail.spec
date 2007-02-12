@@ -1,5 +1,5 @@
 Summary:	TMail mail library
-Summary(pl.UTF-8):   TMail - biblioteka do obsługi poczty
+Summary(pl.UTF-8):	TMail - biblioteka do obsługi poczty
 Name:		ruby-TMail
 Version:	0.10.8
 Release:	4
