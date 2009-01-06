@@ -19,6 +19,14 @@ Mail handling module for Ruby.
 %description -l pl.UTF-8
 Moduł dla języka Ruby obsługujący pocztę.
 
+%package rdoc
+Summary:	Documentation files for TMail mail library
+Group:		Documentation
+Requires:	ruby >= 1:1.8.7-4
+
+%description rdoc
+Documentation files for TMail mail library
+
 %prep
 %setup -q -n tmail-%{version}
 
@@ -34,21 +42,30 @@ rdoc --ri -o ri lib/*
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{ruby_rubylibdir},%{ruby_ridir}}
+install -d $RPM_BUILD_ROOT{%{ruby_rubylibdir},%{ruby_ridir},%{ruby_rdocdir}}
 
 ruby setup.rb install --prefix=$RPM_BUILD_ROOT
 
 cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
+cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
+
+rm $RPM_BUILD_ROOT%{ruby_ridir}/created.rid
+# dunno. wasn't packaged before
+rm -rf $RPM_BUILD_ROOT%{ruby_ridir}/ri/Enumerable
+rm -rf $RPM_BUILD_ROOT%{ruby_ridir}/ri/File
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc rdoc/*
-%{ruby_rubylibdir}/tmail
-%{ruby_rubylibdir}/tmail.rb
 %attr(755,root,root) %{ruby_archdir}/tmail/*.so
-%{ruby_ridir}/TMail
-%{ruby_ridir}/StringInput
-%{ruby_ridir}/StringOutput
+%{ruby_rubylibdir}/tmail.rb
+%{ruby_rubylibdir}/tmail
+
+%files rdoc
+%defattr(644,root,root,755)
+%{ruby_rdocdir}/%{name}-%{version}
+%{ruby_ridir}/ri/TMail
+%{ruby_ridir}/ri/StringInput
+%{ruby_ridir}/ri/StringOutput
