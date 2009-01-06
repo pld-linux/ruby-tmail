@@ -9,6 +9,7 @@ Source0:	http://i.loveruby.net/archive/tmail/tmail-%{version}.tar.gz
 # Source0-md5:	abd5916459691aec669f1bbf78e201d3
 URL:		http://i.loveruby.net/en/prog/tmail.html
 BuildRequires:	rpmbuild(macros) >= 1.277
+BuildRequires:	ruby >= 1:1.8.6
 BuildRequires:	ruby-devel
 %{?ruby_mod_ver_requires_eq}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -40,6 +41,11 @@ ruby setup.rb setup
 rdoc -o rdoc/ --main README.en README.en README.ja NEWS BUGS TODO lib/* doc/* doc.en/* doc.ja/* --title "%{name} %{version}" --inline-source
 rdoc --ri -o ri lib/*
 
+rm -f ri/created.rid
+# dunno. wasn't packaged before
+rm -rf ri/Enumerable
+rm -rf ri/File
+
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{ruby_rubylibdir},%{ruby_ridir},%{ruby_rdocdir}}
@@ -48,11 +54,6 @@ ruby setup.rb install --prefix=$RPM_BUILD_ROOT
 
 cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
 cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
-
-rm $RPM_BUILD_ROOT%{ruby_ridir}/created.rid
-# dunno. wasn't packaged before
-rm -rf $RPM_BUILD_ROOT%{ruby_ridir}/ri/Enumerable
-rm -rf $RPM_BUILD_ROOT%{ruby_ridir}/ri/File
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -66,6 +67,6 @@ rm -rf $RPM_BUILD_ROOT
 %files rdoc
 %defattr(644,root,root,755)
 %{ruby_rdocdir}/%{name}-%{version}
-%{ruby_ridir}/ri/TMail
-%{ruby_ridir}/ri/StringInput
-%{ruby_ridir}/ri/StringOutput
+%{ruby_ridir}/TMail
+%{ruby_ridir}/StringInput
+%{ruby_ridir}/StringOutput
