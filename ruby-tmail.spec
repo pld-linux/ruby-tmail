@@ -22,11 +22,15 @@ Moduł dla języka Ruby obsługujący pocztę.
 
 %package rdoc
 Summary:	Documentation files for TMail mail library
+Summary(pl.UTF-8):	Pliki dokumentacji do biblioteki TMail służącej do obsługi poczty
 Group:		Documentation
 Requires:	ruby >= 1:1.8.7-4
 
 %description rdoc
 Documentation files for TMail mail library
+
+%description rdoc -l pl.UTF-8
+Pliki dokumentacji do biblioteki TMail służącej do obsługi poczty.
 
 %prep
 %setup -q -n tmail-%{version}
