@@ -1,17 +1,20 @@
+%define pkgname tmail
 Summary:	TMail mail library
 Summary(pl.UTF-8):	TMail - biblioteka do obsługi poczty
-Name:		ruby-TMail
+Name:		ruby-%{pkgname}
 Version:	0.10.8
 Release:	4
 License:	GPL
 Group:		Development/Languages
-Source0:	http://i.loveruby.net/archive/tmail/tmail-%{version}.tar.gz
+Source0:	http://i.loveruby.net/archive/tmail/%{pkgname}-%{version}.tar.gz
 # Source0-md5:	abd5916459691aec669f1bbf78e201d3
 URL:		http://i.loveruby.net/en/prog/tmail.html
 BuildRequires:	rpmbuild(macros) >= 1.277
 BuildRequires:	ruby >= 1:1.8.6
 BuildRequires:	ruby-devel
 %{?ruby_mod_ver_requires_eq}
+Obsoletes:	ruby-TMail
+Provides:	ruby-TMail
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -42,7 +45,7 @@ ruby setup.rb config \
 
 ruby setup.rb setup
 
-rdoc -o rdoc/ --main README.en README.en README.ja NEWS BUGS TODO lib/* doc/* doc.en/* doc.ja/* --title "%{name} %{version}" --inline-source
+rdoc -o rdoc/ --main README.en README.en README.ja NEWS BUGS TODO lib/* doc/* doc.en/* doc.ja/* --title "%{pkgname} %{version}" --inline-source
 rdoc --ri -o ri lib/*
 
 rm -f ri/created.rid
