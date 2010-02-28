@@ -2,17 +2,20 @@
 Summary:	TMail mail library
 Summary(pl.UTF-8):	TMail - biblioteka do obsługi poczty
 Name:		ruby-%{pkgname}
-Version:	0.10.8
-Release:	4
+# WARNING! TMail >= 1.2.5 is not compatible with ruby 1.9!
+Version:	1.2.3.1
+Release:	1
 License:	GPL
 Group:		Development/Languages
-Source0:	http://i.loveruby.net/archive/tmail/%{pkgname}-%{version}.tar.gz
-# Source0-md5:	abd5916459691aec669f1bbf78e201d3
-URL:		http://i.loveruby.net/en/prog/tmail.html
+Source0:	http://rubygems.org/downloads/%{pkgname}-%{version}.gem
+# Source0-md5:	06e10d8633619b106e450005454485ca
+Patch0:		%{name}-fixes.patch
+URL:		http://tmail.rubyforge.org/
 BuildRequires:	rpmbuild(macros) >= 1.277
 BuildRequires:	ruby >= 1:1.8.6
 BuildRequires:	ruby-devel
 %{?ruby_mod_ver_requires_eq}
+Requires:	ruby-rchardet >= 1.3
 Obsoletes:	ruby-TMail
 Provides:	ruby-TMail
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -36,16 +39,20 @@ Documentation files for TMail mail library
 Pliki dokumentacji do biblioteki TMail służącej do obsługi poczty.
 
 %prep
-%setup -q -n tmail-%{version}
+%setup -q -c
+%{__tar} xf %{SOURCE0} -O data.tar.gz | %{__tar} xz
+find -newer README  -o -print | xargs touch --reference %{SOURCE0}
+%patch0 -p1
 
 %build
 ruby setup.rb config \
-	--rb-dir=%{ruby_rubylibdir} \
-	--so-dir=%{ruby_archdir}
+	--rbdir=%{ruby_rubylibdir} \
+	--sodir=%{ruby_archdir} \
+	--without_ext yes
 
 ruby setup.rb setup
 
-rdoc -o rdoc/ --main README.en README.en README.ja NEWS BUGS TODO lib/* doc/* doc.en/* doc.ja/* --title "%{pkgname} %{version}" --inline-source
+rdoc -o rdoc/ --main README lib/* --title "%{pkgname} %{version}" --inline-source
 rdoc --ri -o ri lib/*
 
 rm -f ri/created.rid
@@ -57,8 +64,7 @@ rm -rf ri/File
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{ruby_rubylibdir},%{ruby_ridir},%{ruby_rdocdir}}
 
-ruby setup.rb install --prefix=$RPM_BUILD_ROOT
-
+cp -a lib/* $RPM_BUILD_ROOT%{ruby_rubylibdir}
 cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
 cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
 
@@ -67,7 +73,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%attr(755,root,root) %{ruby_archdir}/tmail/*.so
 %{ruby_rubylibdir}/tmail.rb
 %{ruby_rubylibdir}/tmail
 
