@@ -1,0 +1,207 @@
+ ext/tmailscanner/tmail/extconf.rb |    2 +-
+ lib/tmail/mail.rb                 |   12 ++++++++++++
+ lib/tmail/quoting.rb              |   16 ++++++++--------
+ setup.rb                          |    2 +-
+ test/test_address.rb              |    8 +++++---
+ test/test_header.rb               |    4 ++--
+ test/test_helper.rb               |    2 +-
+ test/test_mail.rb                 |    3 ++-
+ 8 files changed, 32 insertions(+), 17 deletions(-)
+
+diff --git a/ext/tmailscanner/tmail/extconf.rb b/ext/tmailscanner/tmail/extconf.rb
+index abdd007..caa8e3d 100644
+--- a/ext/tmailscanner/tmail/extconf.rb
++++ b/ext/tmailscanner/tmail/extconf.rb
+@@ -1,7 +1,7 @@
+ require 'mkmf'
+ require 'rbconfig'
+ 
+-extension_name = 'tmailscanner'
++extension_name = 'tmail/tmailscanner'
+ 
+ windows = (/djgpp|(cyg|ms|bcc)win|mingw/ =~ RUBY_PLATFORM)
+ 
+diff --git a/lib/tmail/mail.rb b/lib/tmail/mail.rb
+index 5a31990..e08bd4b 100644
+--- a/lib/tmail/mail.rb
++++ b/lib/tmail/mail.rb
+@@ -130,6 +130,7 @@ module TMail
+       @config = Config.to_config(conf)
+ 
+       @header      = {}
++      @header_orig = {}
+       @body_port   = nil
+       @body_parsed = false
+       @epilogue    = ''
+@@ -236,6 +237,10 @@ module TMail
+       @header.dup
+     end
+ 
++    def header_orig
++      @header_orig.dup
++    end
++
+     # Returns a TMail::AddressHeader object of the field you are querying.
+     # Examples:
+     #  @mail['from']  #=> #<TMail::AddressHeader "mikel@test.com.au">
+@@ -388,8 +393,10 @@ module TMail
+     def parse_header( f )
+       name = field = nil
+       unixfrom = nil
++      orig = ''
+ 
+       while line = f.gets
++        orig += line
+         case line
+         when /\A[ \t]/             # continue from prev line
+           raise SyntaxError, 'mail is began by space' unless field
+@@ -419,6 +426,7 @@ module TMail
+       if unixfrom
+         add_hf 'Return-Path', "<#{unixfrom}>" unless @header['return-path']
+       end
++      add_oh orig
+     end
+ 
+     def add_hf( name, field )
+@@ -436,6 +444,10 @@ module TMail
+       HeaderField.new(name, field, @config)
+     end
+ 
++    def add_oh( str )
++      @header_orig = str
++    end
++
+     ###
+     ### body
+     ###
+diff --git a/lib/tmail/quoting.rb b/lib/tmail/quoting.rb
+index cb9f428..218bfa6 100644
+--- a/lib/tmail/quoting.rb
++++ b/lib/tmail/quoting.rb
+@@ -92,7 +92,7 @@ module TMail
+         convert_to(Base64.decode(text), to, from)
+       end
+ 
+-      begin
++      #begin
+         require 'iconv'
+         def convert_to(text, to, from)
+           return text unless to && from
+@@ -106,13 +106,13 @@ module TMail
+           # X-UNKNOWN.
+           text
+         end
+-      rescue LoadError
+-        # Not providing quoting support
+-        def convert_to(text, to, from)
+-          warn "Action Mailer: iconv not loaded; ignoring conversion from #{from} to #{to} (#{__FILE__}:#{__LINE__})"
+-          text
+-        end
+-      end
++      #rescue LoadError
++      #  # Not providing quoting support
++      #  def convert_to(text, to, from)
++      #    warn "Action Mailer: iconv not loaded; ignoring conversion from #{from} to #{to} (#{__FILE__}:#{__LINE__})"
++      #    text
++      #  end
++      #end
+     end
+   end
+ end
+diff --git a/setup.rb b/setup.rb
+index 8ecfd27..8c2c90b 100755
+--- a/setup.rb
++++ b/setup.rb
+@@ -1016,7 +1016,7 @@ module Setup
+     def exec_task_traverse(task)
+       run_hook "pre-#{task}"
+       FILETYPES.each do |type|
+-        if type == 'ext' and config.without_ext == 'yes'
++        if type == 'ext' and config.without_ext
+           $stderr.puts 'skipping ext/* by user option' if verbose?
+           next
+         end
+diff --git a/test/test_address.rb b/test/test_address.rb
+index 7d7a610..453fda0 100644
+--- a/test/test_address.rb
++++ b/test/test_address.rb
+@@ -176,9 +176,11 @@ class TestAddress < Test::Unit::TestCase
+     # GyRCRnxLXDhsGyhC
+ 
+     TMail.KCODE = 'NONE'
++    expected = "\e$BF|K\\8l\e(B"
++    expected.force_encoding("ISO-2022-JP") if expected.respond_to? :force_encoding
+     validate_case__address\
+     '=?iso-2022-jp?B?GyRCRnxLXDhsGyhC?= <aamine@loveruby.net>',
+-        :display_name => "\e$BF|K\\8l\e(B",
++        :display_name => expected,
+         :address      => 'aamine@loveruby.net',
+         :local        => 'aamine',
+         :domain       => 'loveruby.net',
+@@ -186,7 +188,7 @@ class TestAddress < Test::Unit::TestCase
+ 
+     validate_case__address\
+     '=?iso-2022-jp?Q?=1b=24=42=46=7c=4b=5c=38=6c=1b=28=42?= <aamine@loveruby.net>',
+-        :display_name => "\e$BF|K\\8l\e(B",
++        :display_name => expected,
+         :address      => 'aamine@loveruby.net',
+         :local        => 'aamine',
+         :domain       => 'loveruby.net',
+@@ -213,7 +215,7 @@ class TestAddress < Test::Unit::TestCase
+ 
+     TMail.KCODE = 'SJIS'
+     expected = "\223\372\226{\214\352"
+-    expected.force_encoding('Windows-31J') if expected.respond_to? :force_encoding
++    expected.force_encoding('Shift_JIS') if expected.respond_to? :force_encoding
+     validate_case__address\
+     '=?iso-2022-jp?B?GyRCRnxLXDhsGyhC?= <aamine@loveruby.net>',
+         :display_name => expected,
+diff --git a/test/test_header.rb b/test/test_header.rb
+index e00d069..d3681a6 100644
+--- a/test/test_header.rb
++++ b/test/test_header.rb
+@@ -866,7 +866,7 @@ class ContentDispositionHeaderTester < Test::Unit::TestCase
+     assert_equal 'attachment', h.disposition
+     assert_equal 1, h.params.size
+     expected = "\223\372\226{\214\352.doc"
+-    expected.force_encoding 'Windows-31J' if expected.respond_to? :force_encoding
++    expected.force_encoding 'Shift_JIS' if expected.respond_to? :force_encoding
+     assert_equal expected, h.params['filename']
+ 
+     # raw SJIS string in value (quoted-string)
+@@ -894,7 +894,7 @@ class ContentDispositionHeaderTester < Test::Unit::TestCase
+     assert_equal 'attachment', h.disposition
+     assert_equal 1, h.params.size
+     expected = "\223\372\226{\214\352.doc"
+-    expected.force_encoding 'Windows-31J' if expected.respond_to? :force_encoding
++    expected.force_encoding 'Shift_JIS' if expected.respond_to? :force_encoding
+     assert_equal expected, h.params['filename']
+   end
+ 
+diff --git a/test/test_helper.rb b/test/test_helper.rb
+index 5fe2481..3bc1c6d 100644
+--- a/test/test_helper.rb
++++ b/test/test_helper.rb
+@@ -2,7 +2,7 @@
+ # gem that is already installed.
+ require 'stringio'
+ $:.unshift File.dirname(__FILE__) + "/../lib"
+-$:.unshift File.dirname(__FILE__) + "/../lib/tmail"
++$:.unshift File.dirname(__FILE__) + "/../ext/mailscanner"
+ require 'test/unit'
+ require 'extctrl'
+ require 'test/unit'
+diff --git a/test/test_mail.rb b/test/test_mail.rb
+index 659a11f..dc7e76d 100644
+--- a/test/test_mail.rb
++++ b/test/test_mail.rb
+@@ -735,7 +735,8 @@ EOF
+     str = mail.encoded
+     result = str.gsub(str[/boundary="(.*?)"/, 1], 'boundary')
+     expected =<<EOF
+-Content-Type: multipart/mixed; boundary="boundary"
++Content-Type: multipart/mixed;
++	boundary="boundary"
+ 
+ This is the preamble
+ --boundary
