@@ -26,6 +26,18 @@ Mail handling module for Ruby.
 %description -l pl.UTF-8
 Moduł dla języka Ruby obsługujący pocztę.
 
+%package ri
+Summary:	ri documentation for %{pkgname}
+Summary(pl.UTF-8):	Dokumentacja w formacie ri dla %{pkgname}
+Group:		Documentation
+Requires:	ruby
+
+%description ri
+ri documentation for %{pkgname}.
+
+%description ri -l pl.UTF-8
+Dokumentacji w formacie ri dla %{pkgname}.
+
 %package rdoc
 Summary:	Documentation files for TMail mail library
 Summary(pl.UTF-8):	Pliki dokumentacji do biblioteki TMail służącej do obsługi poczty
@@ -52,13 +64,10 @@ ruby setup.rb config \
 
 ruby setup.rb setup
 
-rdoc -o rdoc/ --main README lib/* --title "%{pkgname} %{version}" --inline-source
-rdoc --ri -o ri lib/*
-
-rm -f ri/created.rid
-# dunno. wasn't packaged before
-rm -rf ri/Enumerable
-rm -rf ri/File
+rdoc --ri -o ri lib
+rdoc --op rdoc lib
+rm ri/created.rid
+rm -r ri/{Enumerable,StringInput,StringOutput}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -79,6 +88,6 @@ rm -rf $RPM_BUILD_ROOT
 %files rdoc
 %defattr(644,root,root,755)
 %{ruby_rdocdir}/%{name}-%{version}
+
+%files ri
 %{ruby_ridir}/TMail
-%{ruby_ridir}/StringInput
-%{ruby_ridir}/StringOutput
