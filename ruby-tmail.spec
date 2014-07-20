@@ -67,7 +67,8 @@ ruby setup.rb setup
 rdoc --ri -o ri lib
 rdoc --op rdoc lib
 rm ri/created.rid
-rm -r ri/{Enumerable,StringInput,StringOutput}
+rm ri/cache.ri
+rm -r ri/{Address,Array,Config,FalseClass,File,Hash,NilClass,Numeric,Object,Parser,String,TrueClass}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -91,3 +92,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files ri
 %{ruby_ridir}/TMail
+%{ruby_ridir}/Mail
+%{ruby_ridir}/Maildir
+%{ruby_ridir}/MhMailbox
+%{ruby_ridir}/TMailScanner
+%{ruby_ridir}/UNIXMbox
