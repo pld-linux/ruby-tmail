@@ -4,20 +4,21 @@ Summary(pl.UTF-8):	TMail - biblioteka do obsługi poczty
 Name:		ruby-%{pkgname}
 # WARNING! TMail >= 1.2.5 is not compatible with ruby 1.9!
 Version:	1.2.3.1
-Release:	1
+Release:	2
 License:	GPL
 Group:		Development/Languages
 Source0:	http://rubygems.org/downloads/%{pkgname}-%{version}.gem
 # Source0-md5:	06e10d8633619b106e450005454485ca
 Patch0:		%{name}-fixes.patch
 URL:		http://tmail.rubyforge.org/
-BuildRequires:	rpmbuild(macros) >= 1.277
-BuildRequires:	ruby >= 1:1.8.6
-BuildRequires:	ruby-devel
-%{?ruby_mod_ver_requires_eq}
+BuildRequires:	rpm-rubyprov
+BuildRequires:	rpmbuild(macros) >= 1.665
+BuildRequires:	ruby-irb
+BuildRequires:	ruby-json
 Requires:	ruby-rchardet >= 1.3
-Obsoletes:	ruby-TMail
 Provides:	ruby-TMail
+Obsoletes:	ruby-TMail
+BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -58,7 +59,7 @@ find -newer README  -o -print | xargs touch --reference %{SOURCE0}
 
 %build
 ruby setup.rb config \
-	--rbdir=%{ruby_rubylibdir} \
+	--rbdir=%{ruby_vendorlibdir} \
 	--sodir=%{ruby_archdir} \
 	--without_ext yes
 
@@ -68,13 +69,14 @@ rdoc --ri -o ri lib
 rdoc --op rdoc lib
 rm ri/created.rid
 rm ri/cache.ri
-rm -r ri/{Address,Array,Config,FalseClass,File,Hash,NilClass,Numeric,Object,Parser,String,TrueClass}
+rm ri/lib/tmail/page-Makefile.ri
+rm -r ri/{Array,FalseClass,File,Hash,NilClass,Numeric,Object,String,TrueClass}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{ruby_rubylibdir},%{ruby_ridir},%{ruby_rdocdir}}
+install -d $RPM_BUILD_ROOT{%{ruby_vendorlibdir},%{ruby_ridir},%{ruby_rdocdir}}
 
-cp -a lib/* $RPM_BUILD_ROOT%{ruby_rubylibdir}
+cp -a lib/* $RPM_BUILD_ROOT%{ruby_vendorlibdir}
 cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
 cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
 
@@ -83,17 +85,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%{ruby_rubylibdir}/tmail.rb
-%{ruby_rubylibdir}/tmail
+%{ruby_vendorlibdir}/tmail.rb
+%{ruby_vendorlibdir}/tmail
 
 %files rdoc
 %defattr(644,root,root,755)
 %{ruby_rdocdir}/%{name}-%{version}
 
 %files ri
+%defattr(644,root,root,755)
 %{ruby_ridir}/TMail
-%{ruby_ridir}/Mail
-%{ruby_ridir}/Maildir
-%{ruby_ridir}/MhMailbox
-%{ruby_ridir}/TMailScanner
-%{ruby_ridir}/UNIXMbox
