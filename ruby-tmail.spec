@@ -4,7 +4,7 @@ Summary(pl.UTF-8):	TMail - biblioteka do obsługi poczty
 Name:		ruby-%{pkgname}
 # WARNING! TMail >= 1.2.5 is not compatible with ruby 1.9!
 Version:	1.2.3.1
-Release:	3
+Release:	4
 License:	GPL
 Group:		Development/Languages
 Source0:	http://rubygems.org/downloads/%{pkgname}-%{version}.gem
@@ -13,9 +13,9 @@ Patch0:		%{name}-fixes.patch
 URL:		http://tmail.rubyforge.org/
 BuildRequires:	rpm-rubyprov
 BuildRequires:	rpmbuild(macros) >= 1.665
-BuildRequires:	ruby-iconv
 BuildRequires:	ruby-irb
 BuildRequires:	ruby-json
+Requires:	ruby-iconv
 Requires:	ruby-rchardet >= 1.3
 Provides:	ruby-TMail
 Obsoletes:	ruby-TMail
