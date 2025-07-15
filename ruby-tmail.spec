@@ -56,7 +56,7 @@ Pliki dokumentacji do biblioteki TMail służącej do obsługi poczty.
 %setup -q -c
 %{__tar} xf %{SOURCE0} -O data.tar.gz | %{__tar} xz
 find -newer README  -o -print | xargs touch --reference %{SOURCE0}
-%patch0 -p1
+%patch -P0 -p1
 
 %build
 ruby setup.rb config \
